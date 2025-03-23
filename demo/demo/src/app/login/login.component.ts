@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -16,7 +17,7 @@ export class LoginComponent {
   password: string = '';
   mostrarFormulario: string = 'login';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   mostrarLogin() {
     this.mostrarFormulario = 'login';
@@ -37,7 +38,6 @@ export class LoginComponent {
       return;
     }
 
-    // Validación de email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(this.email)) {
       Swal.fire({
@@ -49,30 +49,36 @@ export class LoginComponent {
       return;
     }
 
-    this.authService.login({ email: this.email, password: this.password }).subscribe(
-      response => {
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
+      next: (response) => {
         Swal.fire({
           icon: 'success',
           title: '¡Inicio de sesión exitoso!',
           text: 'Bienvenido de nuevo.',
           confirmButtonColor: '#22c55e'
         }).then(() => {
-          console.log('Token recibido:', response.token);
-          // Guardar el token en el localStorage o sessionStorage
-          localStorage.setItem('token', response.token);
-          // Redirigir al dashboard o página principal
-          window.location.href = '/dashboard';
+          localStorage.setItem('user', JSON.stringify(response.user));
+          this.router.navigate(['/dashboard']);
         });
       },
-      error => {
+      error: () => {
         Swal.fire({
           icon: 'error',
           title: 'Credenciales inválidas',
           text: 'Usuario o contraseña incorrectos. Inténtalo de nuevo.',
           confirmButtonColor: '#ef4444'
         });
-        console.error('Error en el login', error);
       }
-    );
+    });
+  }
+
+  //  Iniciar sesión con Google
+  loginGoogle() {
+    this.authService.loginGoogle();
+  }
+
+  //  Iniciar sesión con GitHub
+  loginGitHub() {
+    this.authService.loginGitHub();
   }
 }

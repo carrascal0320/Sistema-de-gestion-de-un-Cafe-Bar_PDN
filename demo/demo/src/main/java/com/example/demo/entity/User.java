@@ -23,17 +23,25 @@ public class User {
   @Column(nullable = false)
   private String name;
 
-  @Column(nullable = false, unique = true)
+  @Column(unique = true, nullable = true)
   private String phone;
 
   // Constructor vacío
   public User() {}
 
-  // Constructor con parámetros
+  //  para usuarios registrados con email y password
   public User(String email, String password, String name, String phone) {
     this.email = email;
     this.password = password;
     this.name = name;
     this.phone = phone;
+  }
+
+  //   (GitHub/Google)
+  public User(String email, String name) {
+    this.email = email;
+    this.name = name;
+    this.password = "OAuthUser";
+    this.phone = null;
   }
 }
