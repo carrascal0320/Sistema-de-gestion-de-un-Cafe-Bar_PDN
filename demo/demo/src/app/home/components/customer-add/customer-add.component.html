@@ -1,0 +1,26 @@
+<h2>Crear Customers</h2>
+
+<div class="container">
+
+<form>
+    <div class="mb-3">
+        <label for="firstname" class="form-label">Nombres</label>
+        <input [(ngModel)]= "firstName" type="text" id="firstName" class="form-control" name= "firstName">
+      </div>
+
+      <div class="mb-3">
+        <label for="lastname" class="form-label">Apellidos</label>
+        <input [(ngModel)]= "lastName" type="text" id="lastName" class="form-control" name= "lastName">
+      </div>
+
+      <div class="mb-3">
+        <label for="disabledTextInput" class="form-label">Email</label>
+        <input [(ngModel)]= "email" type="email" id="email" class="form-control" name="email">
+      </div>
+      <button type="submit" class="btn btn-primary" (click)="addCustomer()">Crear Usuario</button>
+  </form>
+  <div>
+    
+  </div>
+
+</div>
