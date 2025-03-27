@@ -1,0 +1,55 @@
+<section class="bg-gradient-to-b from-yellow-900 via-amber-800 to-stone-800 absolute inset-0 leading-5 h-full w-full flex items-center justify-center">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+    <h1 class="text-2xl font-bold text-gray-900 text-center mb-6">Create an account</h1>
+
+    <form class="space-y-4" (ngSubmit)="register()">
+      <!-- Campo Nombre -->
+      <div>
+        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+        <input type="text" [(ngModel)]="name" name="name" id="name" placeholder="John Doe" 
+          class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-600 focus:border-amber-600 block w-full p-3" required>
+      </div>
+
+      <!-- Campo Teléfono -->
+      <div>
+        <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
+        <input type="tel" [(ngModel)]="phone" name="phone" id="phone" placeholder="+1234567890" 
+          class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-600 focus:border-amber-600 block w-full p-3" required>
+      </div>
+
+      <!-- Campo Email -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Your email</label>
+        <input type="email" [(ngModel)]="email" name="email" id="email" placeholder="name@company.com" 
+          class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-600 focus:border-amber-600 block w-full p-3" required>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" [(ngModel)]="password" name="password" id="password" placeholder="••••••••" 
+          class="bg-gray-100 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-amber-600 focus:border-amber-600 block w-full p-3" required>
+      </div>
+
+      <!-- Checkbox de Términos y Condiciones -->
+      <div class="flex items-start">
+        <input id="terms" type="checkbox" class="w-4 h-4 border-gray-300 rounded focus:ring-2 focus:ring-amber-500 mt-1" required>
+        <label for="terms" class="ml-2 text-sm text-gray-600">
+          I accept the <a href="#" class="font-medium text-amber-700 hover:underline">Terms and Conditions</a>
+        </label>
+      </div>
+
+      <!-- Botón de Registro -->
+      <button type="submit" class="w-full text-white bg-amber-700 hover:bg-amber-800 focus:ring-4 focus:ring-amber-300 font-medium rounded-lg text-sm px-5 py-3 text-center">
+        Registrar
+      </button>
+
+     
+      <p class="text-sm font-light text-gray-500 text-center">
+        Already have an account?
+        <a href="/login" class="text-white bg-stone-700 hover:bg-stone-800 px-4 py-2 rounded-lg inline-block mt-2">Login</a>
+      </p>
+    </form>
+  </div>
+</section>
+
