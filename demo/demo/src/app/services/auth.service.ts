@@ -8,11 +8,22 @@ import { Observable, tap } from 'rxjs';
 })
 export class AuthService {
   private apiUrl = 'http://localhost:8080/api/auth';
-  private user = signal<any | null>(JSON.parse(localStorage.getItem('user') || 'null'));
+  private user = signal<any | null>(this.getStoredUser());
 
   constructor(private http: HttpClient, private router: Router) {
     this.checkOAuthLogin();
   }
+
+  private getStoredUser(): any | null {
+    const stored = localStorage.getItem('user');
+    try {
+      return stored && stored !== 'undefined' ? JSON.parse(stored) : null;
+    } catch (e) {
+      console.error('Error parsing stored user:', e);
+      return null;
+    }
+  }
+  
 
   register(user: { name: string; phone: string; email: string; password: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, user);
@@ -35,6 +46,11 @@ export class AuthService {
   loginGitHub(): void {
     window.location.href = 'http://localhost:8080/oauth2/authorization/github';
   }
+
+  loginFacebook(): void {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/facebook';
+  }
+  
 
   getAuthenticatedUser(): void {
     this.http.get<any>(`${this.apiUrl}/user`).subscribe({
