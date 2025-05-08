@@ -18,7 +18,9 @@ export class LoginComponent {
   mostrarFormulario: string = 'login';
 
   constructor(private authService: AuthService, private router: Router) {}
-
+  irAResetPassword() {
+    this.router.navigate(['/reset-password']);
+  }
   mostrarLogin() {
     this.mostrarFormulario = 'login';
   }
@@ -81,4 +83,10 @@ export class LoginComponent {
   loginGitHub() {
     this.authService.loginGitHub();
   }
+
+  loginFacebook(){
+    this.authService.loginFacebook();
+  }
+
+
 }

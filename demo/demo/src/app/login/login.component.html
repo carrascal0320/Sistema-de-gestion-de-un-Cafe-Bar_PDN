@@ -20,7 +20,8 @@
       </div>
 
       <div class="flex justify-end mt-2">
-        <a href="#" class="text-blue-600 hover:text-blue-500 text-sm">Forgot Password?</a>
+        <a href="/forgot-password" class="text-blue-600 hover:text-blue-500 text-sm">Forgot Password?</a>
+
       </div>
 
       <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-semibold shadow-md transition-all mt-4">
@@ -43,6 +44,10 @@
       <button (click)="loginGitHub()" class="flex items-center justify-center gap-2 w-full border border-gray-300 hover:bg-gray-100 rounded-xl py-2 transition">
         <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" class="w-5 h-5">
         <span class="text-gray-600 text-sm">GitHub</span>
+      </button>
+      <button (click)="loginFacebook()" class="flex items-center justify-center gap-2 w-full border border-gray-300 hover:bg-gray-100 rounded-xl py-2 transition">
+        <img src="https://www.svgrepo.com/show/475647/facebook-color.svg" alt="Facebook" class="w-5 h-5">
+        <span class="text-gray-600 text-sm">Facebook</span>
       </button>
     </div>
   </div>

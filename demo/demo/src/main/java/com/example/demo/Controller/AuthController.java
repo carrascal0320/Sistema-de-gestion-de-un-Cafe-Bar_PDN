@@ -3,9 +3,16 @@ package com.example.demo.Controller;
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+import com.example.demo.entity.PasswordResetToken;
+import com.example.demo.repository.UserRepository;
+import com.example.demo.service.EmailService;
+import com.example.demo.service.PasswordResetService;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Date;
 
 import java.security.Principal;
 import java.util.Map;
@@ -16,6 +23,47 @@ import java.util.Optional;
 @CrossOrigin("*")
 public class AuthController {
   private final UserService userService;
+
+  @Autowired
+  private PasswordResetService passwordResetService;
+
+  @Autowired
+  private EmailService emailService;
+
+  @Autowired
+  private UserRepository userRepository;
+
+  @PostMapping("/request-reset")
+  public ResponseEntity<?> requestReset(@RequestBody Map<String, String> request) {
+    String email = request.get("email");
+    Optional<User> optionalUser = userService.findByEmail(email);
+
+    if (optionalUser.isEmpty()) {
+      return ResponseEntity.badRequest().body(Map.of("message", "Correo no encontrado"));
+    }
+
+
+    String resetLink = "http://localhost:4200/reset-password";
+
+    emailService.sendEmail(email, "Restablecer Contraseña",
+      "Haz clic en este enlace para restablecer tu contraseña: " + resetLink);
+
+    return ResponseEntity.ok(Map.of("message", "Correo de restablecimiento enviado"));
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+    String email = request.get("email");
+    String newPassword = request.get("password");
+
+    try {
+      userService.resetPassword(email, newPassword); // Llamamos al método del servicio
+      return ResponseEntity.ok(Map.of("message", "Contraseña actualizada correctamente"));
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+    }
+  }
+
 
   public AuthController(UserService userService) {
     this.userService = userService;
