@@ -13,10 +13,6 @@ Se integró el inicio de sesión utilizando cuentas de Facebook, aprovechando Fi
 
 **Pasos realizados:**
 
-1. **Configuración en Firebase:**
-   - Activación del proveedor de autenticación de Facebook en la consola de Firebase.
-   - Registro del ID de la aplicación y la clave secreta proporcionados por Facebook.
-
 2. **Configuración en Facebook Developers:**
    - Creación de una nueva aplicación en [Facebook for Developers](https://developers.facebook.com/).
    - Configuración de la URI de redirección proporcionada por Firebase.
