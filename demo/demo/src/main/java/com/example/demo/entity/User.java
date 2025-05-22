@@ -20,7 +20,7 @@ public class User {
   @Column(nullable = false)
   private String password;
 
-  @Column(nullable = false)
+  @Column(nullable = true)
   private String name;
 
   @Column(unique = true, nullable = true)
@@ -40,8 +40,9 @@ public class User {
   //   (GitHub/Google)
   public User(String email, String name) {
     this.email = email;
-    this.name = name;
+    this.name = (name != null && !name.isEmpty()) ? name : "Usuario desconocido";
     this.password = "OAuthUser";
     this.phone = null;
   }
+
 }

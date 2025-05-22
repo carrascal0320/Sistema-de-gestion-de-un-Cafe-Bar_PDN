@@ -60,7 +60,7 @@ export class LoginComponent {
           confirmButtonColor: '#22c55e'
         }).then(() => {
           localStorage.setItem('user', JSON.stringify(response.user));
-          this.router.navigate(['/dashboard']);
+        
         });
       },
       error: () => {

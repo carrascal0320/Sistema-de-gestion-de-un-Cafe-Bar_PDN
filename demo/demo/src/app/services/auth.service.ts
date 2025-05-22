@@ -34,7 +34,7 @@ export class AuthService {
       tap(response => {
         localStorage.setItem('user', JSON.stringify(response.user)); // Guardar usuario
         this.user.set(response.user);
-        this.router.navigate(['/dashboard']); // Redirigir al dashboard
+        this.router.navigate(['/dashboard']); 
       })
     );
   }
