@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { UserListComponent } from './user-list/user-list.component';
+
 
 export const routes: Routes = [
   {
@@ -54,4 +56,13 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'home',
   },
+  {
+  path: 'users',
+  loadComponent: () =>
+    import('./user-list/user-list.component').then(
+      (m) => m.UserListComponent
+    ),
+  canActivate: [AuthGuard],
+},
+
 ];
