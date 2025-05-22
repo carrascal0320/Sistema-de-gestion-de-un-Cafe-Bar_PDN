@@ -29,24 +29,33 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-      .csrf(csrf -> csrf.disable())  // Desactiva CSRF (si es necesario en tu contexto)
-      .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Habilita CORS
-      .authorizeHttpRequests(auth -> auth
-        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/user", "/api/auth/reset-password", "/api/auth/request-reset")
-        .permitAll()
-        .anyRequest().authenticated()
-      )
-      .oauth2Login(oauth2 -> oauth2
-        .successHandler(oAuthSuccessHandler())  // Maneja el éxito de OAuth2
-        .failureUrl("http://localhost:4200/login?error=true")
-      )
-      .logout(logout -> logout
-        .logoutUrl("/api/auth/logout")
-        .logoutSuccessHandler((request, response, authentication) -> {
-          response.setStatus(HttpServletResponse.SC_OK);
-          response.sendRedirect("http://localhost:4200/login");
-        })
-      );
+        .csrf(csrf -> csrf.disable())
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/api/auth/register",
+                "/api/auth/login",
+                "/api/auth/user",
+                "/api/auth/reset-password",
+                "/api/auth/request-reset",
+                "/api/users/**" // <-- aquí se permite acceso público
+            ).permitAll()
+            .anyRequest().authenticated())
+        .oauth2Login(oauth2 -> oauth2
+            .successHandler(oAuthSuccessHandler())
+            .failureUrl("http://localhost:4200/login?error=true"))
+        .logout(logout -> logout
+            .logoutUrl("/api/auth/logout")
+            .logoutSuccessHandler((request, response, authentication) -> {
+              response.setStatus(HttpServletResponse.SC_OK);
+              response.sendRedirect("http://localhost:4200/login");
+            }))
+        .exceptionHandling(exception -> exception
+            .authenticationEntryPoint((request, response, authException) -> {
+              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+              response.setContentType("application/json");
+              response.getWriter().write("{\"error\": \"No autorizado\"}");
+            }));
 
     return http.build();
   }
@@ -54,10 +63,10 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("http://localhost:4200"));  // Permite solicitudes desde el frontend
+    configuration.setAllowedOrigins(List.of("http://localhost:4200"));
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));  // Asegúrate de incluir los encabezados necesarios
-    configuration.setAllowCredentials(true);  // Permite enviar credenciales (cookies, headers, etc.)
+    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+    configuration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
@@ -82,6 +91,7 @@ public class SecurityConfig {
           email = oAuth2User.getAttribute("id") + "@facebook.com";
         }
       }
+
       userService.processOAuthUser(email, name);
 
       response.sendRedirect("http://localhost:4200/dashboard?email=" + email + "&name=" + name);
