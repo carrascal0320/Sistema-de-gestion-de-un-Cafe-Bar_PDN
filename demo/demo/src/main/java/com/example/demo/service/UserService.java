@@ -2,8 +2,10 @@ package com.example.demo.service;
 
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.CrudAuditoriaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -11,10 +13,15 @@ import java.util.Optional;
 @Service
 public class UserService {
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
+  private final CrudAuditoriaService crudAuditoriaService;
+
   private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
-  public UserService(UserRepository userRepository) {
+  public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, CrudAuditoriaService crudAuditoriaService) {
     this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.crudAuditoriaService = crudAuditoriaService;
   }
 
   // Buscar usuario por email
@@ -37,10 +44,10 @@ public class UserService {
       throw new IllegalArgumentException("Phone number already in use");
     }
 
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-    user.setPassword(user.getPassword());
-
-    return userRepository.save(user);
+    User newUser = userRepository.save(user);
+    return newUser;
   }
 
   // Autenticación de usuario con email y contraseña
@@ -49,12 +56,20 @@ public class UserService {
 
     if (userOptional.isPresent()) {
       User user = userOptional.get();
-      return user.getPassword().equals(password); // Comparar las contraseñas sin encriptar
+      if (passwordEncoder.matches(password, user.getPassword())) {
+        crudAuditoriaService.registrarAutenticacion(email, "PERSONALIZADO");
+        return true;
+      }
     }
-
     return false;
   }
 
+  /**
+   * Procesa un usuario que se autentica a través de OAuth (Google, GitHub, Facebook).
+   * Este método registra el usuario si no existe, o lo recupera si ya está en la DB.
+   * La auditoría del *evento* de autenticación OAuth debe hacerse en el controlador OAuth,
+   * después de que este método haya asegurado que el usuario está en la DB.
+   */
   public User processOAuthUser(String email, String name) {
     Optional<User> existingUser = userRepository.findByEmail(email);
 
@@ -64,22 +79,19 @@ public class UserService {
     }
 
     logger.info("🆕 Registrando nuevo usuario OAuth: " + email);
-
     User newUser = new User(email, name);
-
     User savedUser = userRepository.save(newUser);
     logger.info("✅ Usuario guardado en BD con ID: " + savedUser.getId());
 
     return savedUser;
   }
 
-
   public void resetPassword(String email, String newPassword) {
     Optional<User> optionalUser = userRepository.findByEmail(email);
     if (optionalUser.isPresent()) {
       User user = optionalUser.get();
-      user.setPassword(newPassword);
-      userRepository.save(user); // Guardar el usuario con la nueva contraseña
+      user.setPassword(passwordEncoder.encode(newPassword));
+      userRepository.save(user);
       logger.info("🔐 Contraseña actualizada para el usuario: " + email);
     } else {
       throw new IllegalArgumentException("Usuario no encontrado con el correo: " + email);
