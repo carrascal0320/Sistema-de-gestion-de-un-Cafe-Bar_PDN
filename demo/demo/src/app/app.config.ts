@@ -12,7 +12,8 @@ const routes: Routes = [
   { path: 'reset-password', loadComponent: () => import('./reset-password/reset-password.component').then(m => m.ResetPasswordComponent) },
   { path: 'forgot-password', loadComponent: () => import('./forgot-password/forgot-password.component').then((m) => m.ForgotPasswordComponent) },
   { path: 'dashboard', loadComponent: () => import('./dashboard/dashboard.component').then((m) => m.DashboardComponent), canActivate: [AuthGuard] },
-  { path: 'users', loadComponent: () => import('./user-list/user-list.component').then(m => m.UserListComponent) }, // 👈 Esta es la nueva línea
+  { path: 'users', loadComponent: () => import('./user-list/user-list.component').then(m => m.UserListComponent) }, 
+  { path: 'auditoria', loadComponent: () =>  import('./auditoria-list/auditoria-list.component').then(  (m) => m.AuditoriaListComponent ),canActivate: [AuthGuard], },
   { path: '**', redirectTo: '' }
 ];
 

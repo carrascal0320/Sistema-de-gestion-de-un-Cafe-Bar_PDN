@@ -1,32 +1,37 @@
-<div class="flex h-screen  bg-amber-950 ">
+<div class="flex h-screen bg-amber-950">
 
     <aside class="w-64 bg-gradient-to-b from-brown-700 to-brown-900 text-white p-5 shadow-lg">
         <h2 class="text-3xl font-extrabold text-center">☕ Café-Bar</h2>
         <nav class="mt-5">
             <ul>
-                <li class="py-2"><a href="#" class="block hover:bg-brown-600 px-4 py-3 rounded transition">📊 Dashboard</a></li>
-                <li class="py-2"><a href="#" class="block hover:bg-brown-600 px-4 py-3 rounded transition">📋 Menú</a></li>
+                <li class="py-2"><a routerLink="/dashboard" class="block hover:bg-brown-600 px-4 py-3 rounded transition">📊 Dashboard</a></li>
+                <li class="py-2"><a href="/auditoria" class="block hover:bg-brown-600 px-4 py-3 rounded transition">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    Auditoria  
+                </a></li>
                 <li class="py-2"><a href="#" class="block hover:bg-brown-600 px-4 py-3 rounded transition">🛎️ Pedidos</a></li>
                 <li class="py-2"><a href="#" class="block hover:bg-brown-600 px-4 py-3 rounded transition">👥 Clientes</a></li>
                 <li class="py-2"><a href="#" class="block hover:bg-brown-600 px-4 py-3 rounded transition">💰 Ventas</a></li>
                 <li class="py-2"><a href="#" class="block hover:bg-brown-600 px-4 py-3 rounded transition">📈 Reportes</a></li>
+               
             </ul>
         </nav>
     </aside>
 
-    
     <main class="flex-1 p-6">
 
         <div class="flex justify-between items-center bg-white shadow-md p-4 rounded-lg">
             <h1 class="text-2xl font-semibold">Dashboard</h1>
             <div class="flex items-center space-x-4">
                 <span class="text-gray-700">👤 Admin</span>
-                <a href="/users" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">👥 Usuarios</a>
+                <!-- Usar routerLink en lugar de href para navegación Angular -->
+                <a routerLink="/users" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition">👥 Usuarios</a>
                 <button (click)="logout()" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Cerrar sesión</button>
             </div>
         </div>
 
-       
         <div class="grid grid-cols-3 gap-6 mt-6">
             <div class="bg-white p-6 shadow-lg rounded-lg flex items-center hover:scale-105 transition-transform">
                 <span class="text-4xl text-yellow-600">☕</span>
@@ -51,7 +56,6 @@
             </div>
         </div>
 
-      
         <div class="bg-white p-6 shadow-lg rounded-lg mt-6">
             <h2 class="text-2xl font-bold mb-4">🛎️ Pedidos Recientes</h2>
             <table class="w-full border-collapse border border-gray-300">

@@ -2,6 +2,7 @@ package com.example.demo.config;
 
 import com.example.demo.service.UserService;
 import com.example.demo.service.CrudAuditoriaService;
+import com.example.demo.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -79,14 +80,13 @@ public class SecurityConfig {
     return source;
   }
 
-
-
   @Bean
   public AuthenticationSuccessHandler oAuthSuccessHandler() {
     return (request, response, authentication) -> {
       OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
       String email = oAuth2User.getAttribute("email");
       String name = oAuth2User.getAttribute("name");
+      String phone = null; // No hay un atributo estándar 'phone' en OAuth2User por defecto
 
       if (email == null) {
         email = oAuth2User.getAttribute("login");
@@ -104,8 +104,12 @@ public class SecurityConfig {
       }
 
       if (email != null) {
-        userService.processOAuthUser(email, name);
-        crudAuditoriaService.registrarAutenticacion(email, metodoAutenticacion);
+        User userInDb = userService.processOAuthUser(email, name);
+        if (userInDb != null && userInDb.getPhone() != null) {
+          phone = userInDb.getPhone();
+        }
+
+        crudAuditoriaService.registrarAutenticacion(email, name, phone, metodoAutenticacion);
         response.sendRedirect("http://localhost:4200/dashboard?email=" + email + "&name=" + (name != null ? name : ""));
       } else {
         response.sendRedirect("http://localhost:4200/login?error=email_not_found");

@@ -47,6 +47,7 @@ public class UserService {
     user.setPassword(passwordEncoder.encode(user.getPassword()));
 
     User newUser = userRepository.save(user);
+
     return newUser;
   }
 
@@ -57,7 +58,8 @@ public class UserService {
     if (userOptional.isPresent()) {
       User user = userOptional.get();
       if (passwordEncoder.matches(password, user.getPassword())) {
-        crudAuditoriaService.registrarAutenticacion(email, "PERSONALIZADO");
+        // Registrar la autenticación exitosa con nombre y teléfono del usuario autenticado
+        crudAuditoriaService.registrarAutenticacion(user.getEmail(), user.getName(), user.getPhone(), "PERSONALIZADO");
         return true;
       }
     }

@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
+import { AuthGuard } from './guards/auth.guard'; // Asegúrate de que AuthGuard esté implementado si no lo tienes
 import { UserListComponent } from './user-list/user-list.component';
-
+import { AuditoriaListComponent } from './auditoria-list/auditoria-list.component'; // Importa el nuevo componente
 
 export const routes: Routes = [
   {
@@ -36,7 +36,6 @@ export const routes: Routes = [
         (m) => m.ResetPasswordComponent
       ),
   },
-
   {
     path: 'forgot-password',
     loadComponent: () =>
@@ -50,19 +49,26 @@ export const routes: Routes = [
       import('./dashboard/dashboard.component').then(
         (m) => m.DashboardComponent
       ),
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard], // Protegido por AuthGuard
   },
   {
-    path: '**',
+    path: 'users',
+    loadComponent: () =>
+      import('./user-list/user-list.component').then(
+        (m) => m.UserListComponent
+      ),
+    canActivate: [AuthGuard], // Protegido por AuthGuard
+  },
+  {
+    path: 'auditoria', // Nueva ruta para el componente de auditoría
+    loadComponent: () =>
+      import('./auditoria-list/auditoria-list.component').then(
+        (m) => m.AuditoriaListComponent
+      ),
+    canActivate: [AuthGuard], // Protegido por AuthGuard, ya que solo el administrador debe verlo
+  },
+  {
+    path: '**', // Ruta comodín para cualquier otra URL no reconocida
     redirectTo: 'home',
   },
-  {
-  path: 'users',
-  loadComponent: () =>
-    import('./user-list/user-list.component').then(
-      (m) => m.UserListComponent
-    ),
-  canActivate: [AuthGuard],
-},
-
 ];
