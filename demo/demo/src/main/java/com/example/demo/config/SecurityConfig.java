@@ -1,12 +1,12 @@
 package com.example.demo.config;
 
 import com.example.demo.service.UserService;
+import com.example.demo.service.CrudAuditoriaService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -14,6 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 import java.util.List;
 
@@ -21,41 +22,46 @@ import java.util.List;
 public class SecurityConfig {
 
   private final UserService userService;
+  private final CrudAuditoriaService crudAuditoriaService;
 
-  public SecurityConfig(UserService userService) {
+  public SecurityConfig(UserService userService, CrudAuditoriaService crudAuditoriaService) {
     this.userService = userService;
+    this.crudAuditoriaService = crudAuditoriaService;
   }
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .csrf(csrf -> csrf.disable())
-        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers(
-                "/api/auth/register",
-                "/api/auth/login",
-                "/api/auth/user",
-                "/api/auth/reset-password",
-                "/api/auth/request-reset",
-                "/api/users/**" // <-- aquí se permite acceso público
-            ).permitAll()
-            .anyRequest().authenticated())
-        .oauth2Login(oauth2 -> oauth2
-            .successHandler(oAuthSuccessHandler())
-            .failureUrl("http://localhost:4200/login?error=true"))
-        .logout(logout -> logout
-            .logoutUrl("/api/auth/logout")
-            .logoutSuccessHandler((request, response, authentication) -> {
-              response.setStatus(HttpServletResponse.SC_OK);
-              response.sendRedirect("http://localhost:4200/login");
-            }))
-        .exceptionHandling(exception -> exception
-            .authenticationEntryPoint((request, response, authException) -> {
-              response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-              response.setContentType("application/json");
-              response.getWriter().write("{\"error\": \"No autorizado\"}");
-            }));
+      .csrf(csrf -> csrf.disable())
+      .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+      .authorizeHttpRequests(auth -> auth
+        .requestMatchers(
+          "/api/auth/register",
+          "/api/auth/login",
+          "/api/auth/request-reset",
+          "/api/auth/reset-password",
+          "/api/users/**"
+        ).permitAll()
+        .requestMatchers(
+          "/api/auth/user",
+          "/api/auditoria/**"
+        ).authenticated()
+        .anyRequest().authenticated())
+      .oauth2Login(oauth2 -> oauth2
+        .successHandler(oAuthSuccessHandler())
+        .failureUrl("http://localhost:4200/login?error=true"))
+      .logout(logout -> logout
+        .logoutUrl("/api/auth/logout")
+        .logoutSuccessHandler((request, response, authentication) -> {
+          response.setStatus(HttpServletResponse.SC_OK);
+          response.sendRedirect("http://localhost:4200/login");
+        }))
+      .exceptionHandling(exception -> exception
+        .authenticationEntryPoint((request, response, authException) -> {
+          response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+          response.setContentType("application/json");
+          response.getWriter().write("{\"error\": \"No autorizado\", \"message\": \"" + authException.getMessage() + "\"}");
+        }));
 
     return http.build();
   }
@@ -73,10 +79,7 @@ public class SecurityConfig {
     return source;
   }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+
 
   @Bean
   public AuthenticationSuccessHandler oAuthSuccessHandler() {
@@ -87,14 +90,26 @@ public class SecurityConfig {
 
       if (email == null) {
         email = oAuth2User.getAttribute("login");
-        if (email == null && oAuth2User.getAttribute("id") != null) {
+      }
+      if (email == null && authentication instanceof OAuth2AuthenticationToken) {
+        String registrationId = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
+        if ("facebook".equals(registrationId) && oAuth2User.getAttribute("id") != null) {
           email = oAuth2User.getAttribute("id") + "@facebook.com";
         }
       }
 
-      userService.processOAuthUser(email, name);
+      String metodoAutenticacion = "DESCONOCIDO";
+      if (authentication instanceof OAuth2AuthenticationToken) {
+        metodoAutenticacion = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId().toUpperCase();
+      }
 
-      response.sendRedirect("http://localhost:4200/dashboard?email=" + email + "&name=" + name);
+      if (email != null) {
+        userService.processOAuthUser(email, name);
+        crudAuditoriaService.registrarAutenticacion(email, metodoAutenticacion);
+        response.sendRedirect("http://localhost:4200/dashboard?email=" + email + "&name=" + (name != null ? name : ""));
+      } else {
+        response.sendRedirect("http://localhost:4200/login?error=email_not_found");
+      }
     };
   }
 }
