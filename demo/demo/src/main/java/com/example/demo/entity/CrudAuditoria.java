@@ -19,6 +19,12 @@ public class CrudAuditoria { // Nombre de clase simplificado
   @Column(nullable = false)
   private String email; // El email del usuario que se autenticó
 
+  @Column(nullable = true) // El nombre del usuario, puede ser nulo
+  private String name;
+
+  @Column(nullable = true) // El teléfono del usuario, puede ser nulo
+  private String phone;
+
   @Column(nullable = false)
   private String metodoAutenticacion; // El método usado: "PERSONALIZADO", "GOOGLE", "FACEBOOK", "GITHUB"
 
@@ -30,12 +36,16 @@ public class CrudAuditoria { // Nombre de clase simplificado
   }
 
   /**
-   * Constructor para crear un nuevo registro de auditoría.
+   * Constructor para crear un nuevo registro de auditoría con nombre y teléfono.
    * @param email El email del usuario autenticado.
+   * @param name El nombre del usuario (puede ser null).
+   * @param phone El teléfono del usuario (puede ser null).
    * @param metodoAutenticacion El método de autenticación utilizado.
    */
-  public CrudAuditoria(String email, String metodoAutenticacion) {
+  public CrudAuditoria(String email, String name, String phone, String metodoAutenticacion) {
     this.email = email;
+    this.name = name;
+    this.phone = phone;
     this.metodoAutenticacion = metodoAutenticacion;
   }
 
@@ -55,6 +65,22 @@ public class CrudAuditoria { // Nombre de clase simplificado
 
   public void setEmail(String email) {
     this.email = email;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getPhone() {
+    return phone;
+  }
+
+  public void setPhone(String phone) {
+    this.phone = phone;
   }
 
   public String getMetodoAutenticacion() {
